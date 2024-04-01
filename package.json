@@ -1,0 +1,19 @@
+{
+  "name": "gpteventscrapper",
+  "version": "1.0.0",
+  "description": "a scrapper that use chatgpt to get event details ",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "sivaneshwararaj",
+  "license": "MIT",
+  "dependencies": {
+    "csv-parser": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "html-to-text": "^9.0.5",
+    "openai": "^4.31.0",
+    "puppeteer": "^22.6.1",
+    "xlsx": "^0.18.5"
+  }
+}
