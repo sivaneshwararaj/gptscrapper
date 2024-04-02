@@ -49,7 +49,7 @@ async function get_json() {
       
     });
 
-    const messages = [{ role: 'user', content: 'Hello'+newData }]
+    const messages = [{ role: 'user', content: 'Extract every event day and location in json format in the following text '+newData }]
   
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo-16k',
