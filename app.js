@@ -73,85 +73,34 @@ const worksheet = workbook.Sheets[sheetName];
 
 let currentCellRow = 1; // Start at row 1 (A1)
 
-function processCell() {
-    const cellAddress = 'A' + currentCellRow;
-    const cellValue = worksheet[cellAddress].v; 
-    console.log("processing "+cellValue);
-    
-    currentCellRow++; // Move to the next cell down
+async function processCell() {
+  const cellAddress = 'A' + currentCellRow;
+  if (!worksheet[cellAddress]) {
+      console.log('End of column reached.');
+      return;
+  }
+  const cellValue = worksheet[cellAddress].v;
+  console.log("processing " + cellValue);
 
-    // Check if there's a next cell in the column
-    if (worksheet['A' + currentCellRow]) {
-        setTimeout(processCell, 2000);
-        let htmltext=getRenderedHTML(cellValue)
-        const options = {
-            wordwrap: 130,
-            // ...
-          };
-          htmltext.then(html => {
-            const outputData = {
-                url: url,
-                rendered_html: convert(html, options) 
-            };
-        
-        
-            fs.writeFile('data.txt', outputData.rendered_html, (err) => {
-                if (err) {
-                    console.error("Error saving data to txt:", err);
-                } 
-                else {
-                    console.log("Extracted data proceed to process with openai ");
-                    
-                    let jsondata=get_json();
-                    jsondata.then(newdata =>{
-                    const filePath = 'data.json';
-                    fs.readFile(filePath, 'utf8', (err, data) => {
-                        if (err) {
-                            console.error('Error reading file:', err);
-                            return;
-                        }
-                        let jsonData = [];
-                        try {
-                            // Parse existing JSON data
-                            jsonData = JSON.parse(data);
-                        } catch (parseError) {
-                            console.error('Error parsing JSON:', parseError);
-                            return;
-                        }
-                    
-                        // Append new data to the array
-                        jsonData.push(newdata);
-                    
-                        // Convert the updated data back to JSON format
-                        const updatedJsonData = JSON.stringify(jsonData, null, 2);
-                    
-                        // Write the updated JSON data back to the file
-                        fs.writeFile(filePath, updatedJsonData, 'utf8', (writeErr) => {
-                            if (writeErr) {
-                                console.error('Error writing file:', writeErr);
-                                return;
-                            }
-                            console.log('Data successfully added to data.json');
-                        });
-                    });
+  try {
+      const htmltext = await getRenderedHTML(cellValue);
+      const options = { wordwrap: 130 };
+      const outputData = {
+          url: cellValue,
+          rendered_html: convert(htmltext, options)
+      };
 
-                        }).catch(Error=>{})
+      await fs.promises.writeFile('data.txt', outputData.rendered_html);
+      console.log("Extracted data proceed to process with openai");
 
-                }
-            
-        }).catch(error => {
-            console.error("Error extracting HTML:", error); 
-        });
-    }).catch(err=>{
-        console.log("erro")
-    })
-
-
-        
-        
-    } else {
-        console.log('End of column reached.');
-    }
+      const jsondata = await get_json(); // Ensure get_json is refactored to work correctly
+      // Further processing...
+  } catch (error) {
+      console.error("Error during processing:", error);
+  } finally {
+      currentCellRow++; // Move to the next cell down
+      setTimeout(processCell, 2000); // Schedule next process
+  }
 }
 
 // Start the process
