@@ -33,7 +33,7 @@ async function get_json() {
     const filePath = 'data.txt';
 
     // Read data from file
-    fs.readFile(filePath, 'utf8', (err, data) => {
+    fs.readFileSync(filePath, 'utf8', (err, data) => {
       if (err) {
         console.error('Error reading file:', err);
         return;
